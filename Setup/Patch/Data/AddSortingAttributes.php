@@ -13,13 +13,13 @@ use Magento\Eav\Model\Entity\Attribute\ScopedAttributeInterface;
 
 class AddSortingAttributes implements DataPatchInterface
 {
-    /** 
-     * @var ModuleDataSetupInterface 
+    /**
+     * @var ModuleDataSetupInterface
      */
     private $moduleDataSetup;
 
-    /** 
-     * @var EavSetupFactory 
+    /**
+     * @var EavSetupFactory
      */
     private $eavSetupFactory;
 
@@ -62,7 +62,7 @@ class AddSortingAttributes implements DataPatchInterface
                     'input' => 'price',
                     'required' => false,
                     'sort_order' => 50,
-                    'source' => 'Magento\Catalog\Model\Product\Attribute\Backend\Price',
+                    'backend_model' => 'Magento\Catalog\Model\Product\Attribute\Backend\Price',
                     'global' => ScopedAttributeInterface::SCOPE_GLOBAL,
                     'default' => '',
                     'is_used_in_grid' => false,
@@ -86,11 +86,12 @@ class AddSortingAttributes implements DataPatchInterface
                 [
                     'label' => 'Created At Desc for sorting',
                     'group' => 'General',
-                    'type' => 'static',
+                    'type' => 'datetime',
                     'input' => 'date',
                     'required' => false,
                     'sort_order' => 51,
-                    'source' => 'Magento\Eav\Model\Entity\Attribute\Backend\Datetime',
+                    'backend_model' => 'Magento\Eav\Model\Entity\Attribute\Backend\Datetime',
+                    'frontend_model' => 'Magento\Eav\Model\Entity\Attribute\Backend\Datetime',
                     'global' => ScopedAttributeInterface::SCOPE_GLOBAL,
                     'default' => '',
                     'is_used_in_grid' => false,
