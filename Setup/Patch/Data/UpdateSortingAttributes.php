@@ -38,7 +38,7 @@ class UpdateSortingAttributes implements DataPatchInterface
     {
         /** @var EavSetup $eavSetup */
         $eavSetup = $this->eavSetupFactory->create(['setup' => $this->moduleDataSetup]);
-        $eavSetup->updateAttribute(Product::ENTITY, 'create_at', ['frontend_label' => 'Created At', 'used_for_sort_by' => 1]);
+        $eavSetup->updateAttribute(Product::ENTITY, 'created_at', ['frontend_label' => 'Created At', 'used_for_sort_by' => 1]);
     }
 
     /**
