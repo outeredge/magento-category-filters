@@ -9,16 +9,14 @@ class Config
 
     public function afterGetAttributeUsedForSortByArray(CoreConfig $catalogConfig, $options)
     {
-        //unset($options['position']);
-        //unset($options['name']);
+        $options['price'] = __('Price - low to high');
+        $options['price_desc'] = __('Price - high to low');
 
-        $newOptions['price'] = __('Price - low to high');
-        $newOptions['price_desc'] = __('Price - high to low');
+        $options['created_at'] = __('Oldest first');
+        $options['created_at_desc'] = __('Newest first');
 
-        $newOptions['created_at'] = __('Oldest first');
-        $newOptions['created_at_desc'] = __('Newest first');
+        krsort($options);
 
-        return $newOptions;
+        return $options;
     }
 }
-
