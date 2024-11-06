@@ -18,7 +18,6 @@ class Toolbar
         $result = $proceed($collection);
 
         if ($currentOrder) {
-
             switch ($currentOrder) {
                 case 'price_desc':
                     $subject->getCollection()->setOrder('price', 'desc');
