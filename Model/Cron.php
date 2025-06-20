@@ -13,6 +13,7 @@ use Magento\Catalog\Api\ProductRepositoryInterface;
 use Magento\CatalogInventory\Model\Stock\StockItemRepository;
 use Magento\Catalog\Model\Product\Attribute\Source\Status;
 use Magento\Catalog\Model\Product\Type;
+use OuterEdge\CategoryFilters\Helper\Data;
 
 class Cron
 {
@@ -39,7 +40,8 @@ class Cron
         protected Configurable $configModel,
         protected StockRegistryInterface $stockRegistryInterface,
         protected ProductRepositoryInterface $productRepositoryInterface,
-        protected StockItemRepository $stockItemRepository
+        protected StockItemRepository $stockItemRepository,
+        protected Data $helper
     )
     {
         $this->bestSellingRange = self::BEST_SELLING_RANGE;
@@ -68,6 +70,10 @@ class Cron
 
     public function setQtyOrdered()
     {
+        if (!$this->helper->isPopularityEnabled()) {
+            return;
+        }
+
         foreach ($this->getBestSellingProductsCollection() as $product) {
             try {
                 $qtyOrdered = $product->getTimesOrdered();
@@ -123,6 +129,10 @@ class Cron
 
     public function setInStockSearch()
     {
+        if (!$this->helper->isInStockFirstEnabled()) {
+            return;
+        }
+
         foreach ($this->getAllProductsCollection() as $product) {
 
             try {
