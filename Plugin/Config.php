@@ -15,6 +15,8 @@ class Config
         $options['created_at'] = __('Oldest first');
         $options['created_at_desc'] = __('Newest first');
 
+        $options['qty_ordered'] = __('Popularity');
+
         krsort($options);
 
         return $options;

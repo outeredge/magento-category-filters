@@ -25,8 +25,14 @@ class Toolbar
                 case 'created_at_desc':
                     $subject->getCollection()->setOrder('created_at', 'desc');
                     break;
+                case 'qty_ordered':
+                    $subject->getCollection()->setOrder('qty_ordered', 'desc');
+                    break;
             }
         }
+
+        //ToDo if out of stock enabled
+        $collection->setOrder('in_stock_search', 'desc');
 
         return $result;
     }
