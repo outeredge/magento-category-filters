@@ -20,8 +20,10 @@ class Config
         $options['created_at'] = __('Oldest first');
         $options['created_at_desc'] = __('Newest first');
 
-        if ($this->helper->isPopularityEnabled()) {          
+        if ($this->helper->isPopularityEnabled()) {      
             $options['qty_ordered'] = __('Popularity');
+        } else {
+            unset($options['qty_ordered']);
         }
 
         krsort($options);
