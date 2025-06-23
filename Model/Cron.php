@@ -70,12 +70,10 @@ class Cron
 
     public function setQtyOrdered()
     {
-        if (!$this->helper->isPopularityEnabled()) {
-            return;
-        }
-
-        foreach ($this->getBestSellingProductsCollection() as $product) {
-            try {
+        try {
+            $productIdsToIndex = [];
+            foreach ($this->getBestSellingProductsCollection() as $product) {
+            
                 $qtyOrdered = $product->getTimesOrdered();
 
                 //var_dump($product->getSku().' : '.$product->getTypeId().' : '.$qtyOrdered);
@@ -95,6 +93,7 @@ class Cron
                         [$productParent->getId()],
                         ['qty_ordered' => $qtyOrdered],
                         $productParent->getStoreId());
+                    $productIdsToIndex[] = $productParent->getId();
 
                     /*
                     * Force childs to have the same value of parents
@@ -106,6 +105,7 @@ class Cron
                             [$child->getId()],
                             ['qty_ordered' => $qtyOrdered],
                             $child->getStoreId());
+                        $productIdsToIndex[] = $child->getId();
                     }
                 }
 
@@ -113,15 +113,19 @@ class Cron
                     [$product->getId()],
                     ['qty_ordered' => $qtyOrdered],
                     $product->getStoreId());
-
-                $indexer = $this->indexerFactory->create();
-                foreach ($this->indexerIds as $indexerId) {
-                    $indexer->load($indexerId)->reindexRow($product->getId());
-                }
-
-            } catch (\Exception $e) {
-                $this->logger->critical($e->getMessage());
+                $productIdsToIndex[] = $product->getId();
             }
+
+            //Perform bulk re-indexing
+            $productIdsToIndex = array_unique($productIdsToIndex);
+            if (!empty($productIdsToIndex)) {
+                foreach ($this->indexerIds as $indexerId) {
+                    $indexer = $this->indexerFactory->create()->load($indexerId);
+                    $indexer->reindexList($productIdsToIndex);
+                }
+            }
+        } catch (\Exception $e) {
+            $this->logger->critical($e->getMessage());
         }
 
         return;
@@ -133,15 +137,18 @@ class Cron
             return;
         }
 
-        foreach ($this->getAllProductsCollection() as $product) {
-
-            try {
+        try {
+            $productIdsToIndex = [];
+            foreach ($this->getAllProductsCollection() as $product)
+            {
                 $isInStock = 0;
 
                 $salable = $this->stockState->execute($product->getSku());
-                $isInStock = ($salable[0]['qty']) >= 1 ? 1 : 0;
+                if (!empty($salable) && isset($salable[0]['qty'])) {
+                    $isInStock = ($salable[0]['qty']) >= 1 ? 1 : 0;
+                }
 
-                var_dump($product->getSku().' : '.$product->getTypeId().' : '.$isInStock);
+                //var_dump($product->getSku().' : '.$product->getTypeId().' : '.$isInStock);
 
                 $parentsIds = $this->configModel->getParentIdsByChild($product->getId());
                 foreach ($parentsIds as $parentId) {
@@ -157,6 +164,7 @@ class Cron
                         [$productParent->getId()],
                         ['in_stock_search' => $isInStock],
                         $productParent->getStoreId());
+                    $productIdsToIndex[] = $productParent->getId();
 
                     /*
                      * Force childs to have the same value on in_stock_search
@@ -168,22 +176,27 @@ class Cron
                             [$child->getId()],
                             ['in_stock_search' => $isInStock],
                             $child->getStoreId());
+                        $productIdsToIndex[] = $child->getId();
                     }
                 }
 
                 $this->action->updateAttributes(
                     [$product->getId()],
                     ['in_stock_search' => $isInStock],
-                    $product->getStoreId());
-
-                $indexer = $this->indexerFactory->create();
-                foreach ($this->indexerIds as $indexerId) {
-                    $indexer->load($indexerId)->reindexRow($product->getId());
-                }
-
-            } catch (\Exception $e) {
-                $this->logger->critical($e->getMessage());
+                    $product->getStoreId());   
+                $productIdsToIndex[] = $product->getId();        
             }
+
+            //Perform bulk re-indexing
+            $productIdsToIndex = array_unique($productIdsToIndex);
+            if (!empty($productIdsToIndex)) {
+                foreach ($this->indexerIds as $indexerId) {
+                    $indexer = $this->indexerFactory->create()->load($indexerId);
+                    $indexer->reindexList($productIdsToIndex);
+                }
+            }
+        } catch (\Exception $e) {
+            $this->logger->critical($e->getMessage());
         }
 
         return;
