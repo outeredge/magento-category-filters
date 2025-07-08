@@ -12,11 +12,11 @@
             <group id="settings" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0">
                 <label>Settings</label>
                 <field id="enable_in_stock_first" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0" canRestore="0">
-                    <label>Enabled In Stock First?</label>
+                    <label>Show In Stock Products First?</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
                 <field id="enable_popularity" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0" canRestore="0">
-                    <label>Enabled Popularity?</label>
+                    <label>Enable Sort By Popularity?</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
             </group>
