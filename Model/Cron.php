@@ -160,11 +160,13 @@ class Cron
                     /*
                      * Force parent to update status
                      */
-                    $this->action->updateAttributes(
-                        [$productParent->getId()],
-                        ['in_stock_search' => $isInStock],
-                        $productParent->getStoreId());
-                    $productIdsToIndex[] = $productParent->getId();
+                    if ($productParent->getInStockSearch() != $isInStock) {
+                        $this->action->updateAttributes(
+                            [$productParent->getId()],
+                            ['in_stock_search' => $isInStock],
+                            $productParent->getStoreId());
+                        $productIdsToIndex[] = $productParent->getId();
+                    }
 
                     /*
                      * Force childs to have the same value on in_stock_search
@@ -172,19 +174,23 @@ class Cron
                      */
                     $childrensConfig = $productParent->getTypeInstance()->getUsedProducts($productParent);
                     foreach ($childrensConfig as $child) {
-                        $this->action->updateAttributes(
-                            [$child->getId()],
-                            ['in_stock_search' => $isInStock],
-                            $child->getStoreId());
-                        $productIdsToIndex[] = $child->getId();
+                        if ($child->getInStockSearch() != $isInStock) {
+                            $this->action->updateAttributes(
+                                [$child->getId()],
+                                ['in_stock_search' => $isInStock],
+                                $child->getStoreId());
+                            $productIdsToIndex[] = $child->getId();
+                        }
                     }
                 }
 
-                $this->action->updateAttributes(
-                    [$product->getId()],
-                    ['in_stock_search' => $isInStock],
-                    $product->getStoreId());   
-                $productIdsToIndex[] = $product->getId();        
+                if ($product->getInStockSearch() != $isInStock) {
+                    $this->action->updateAttributes(
+                        [$product->getId()],
+                        ['in_stock_search' => $isInStock],
+                        $product->getStoreId());
+                    $productIdsToIndex[] = $product->getId();
+                }
             }
 
             //Perform bulk re-indexing
@@ -210,9 +216,9 @@ class Cron
                 Type::TYPE_SIMPLE,
                 Type::TYPE_VIRTUAL
             ]])
-            ->addAttributeToSelect('*')
+            ->addAttributeToSelect(['entity_id', 'sku'])
            /*->addAttributeToFilter('sku',['in'=>
-                ['vdc-smok-novo-2s-Abstract']
+                ['use-sku-to-test-one-product']
                 ]) */
             ->load();
 

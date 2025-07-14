@@ -5,7 +5,7 @@
 			<schedule>0 3 * * *</schedule>
 		</job>
 		<job instance="OuterEdge\CategoryFilters\Model\Cron" method="setInStockSearch" name="set_in_stock_search_nightly">
-			<schedule>0 * * * *</schedule>
+			<schedule>0 3 * * *</schedule>
 		</job>
 	</group>
 </config>
