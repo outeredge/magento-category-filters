@@ -77,7 +77,8 @@ class Cron
             )    
             ->where('period <= ?', $to)
             ->where('period >= ?', $from)
-            ->group('main_table.product_id');
+            ->group('main_table.product_id')
+            ->limit(100);
 
         return $connection->fetchAll($select);
     }
