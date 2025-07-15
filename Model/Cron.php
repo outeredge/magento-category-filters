@@ -17,6 +17,8 @@ use OuterEdge\CategoryFilters\Helper\Data;
 use Magento\Framework\Stdlib\DateTime\DateTime;
 use Magento\Framework\App\ResourceConnection;
 use Magento\Framework\App\State;
+use Magento\Framework\App\Config\ScopeConfigInterface;
+use Magento\Store\Model\ScopeInterface;
 
 class Cron
 {
@@ -47,10 +49,14 @@ class Cron
         protected Data $helper,
         protected DateTime $dateTime,
         protected ResourceConnection $resourceConnection,
-        protected State $state
+        protected State $state,
+        protected ScopeConfigInterface $scopeConfig
     )
     {
-        $this->bestSellingRange = self::BEST_SELLING_RANGE;
+        $this->bestSellingRange = $this->scopeConfig->getValue(
+            'oe_category_filter/settings/best_selling_range',
+            ScopeInterface::SCOPE_STORE
+        ) ?? self::BEST_SELLING_RANGE;
         $this->state->setAreaCode('adminhtml');
     }
 
@@ -81,10 +87,10 @@ class Cron
         try {
             $productIdsToIndex = [];
 
-            foreach ($this->getBestSellingProductsCollection() as $product) {
+            foreach ($this->getBestSellingProductsCollection() as $item) {
                 
-                $product = $this->productRepositoryInterface->getById($product['product_id']);
-                $ratingScore = intval(round((9 - $product['rating_pos']) * (98 / 8) + 1));
+                $product = $this->productRepositoryInterface->getById($item['product_id']);
+                $ratingScore = intval(round((9 - $item['rating_pos']) * (98 / 8) + 1));
 
                 if ($product->getQtyOrdered() != $ratingScore) {
                     $this->action->updateAttributes(

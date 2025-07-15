@@ -19,6 +19,14 @@
                     <label>Enable Sort By Popularity?</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
+                <field id="popularity_days" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="0" showInStore="0" canRestore="0">
+                    <label>Best Selling Range?</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="best_selling_range" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                    <label>Best-Selling Period (Days)</label>
+                    <validate>required-entry validate-digits validate-digits-range</validate>
+                </field>
             </group>
         </section>
     </system>
