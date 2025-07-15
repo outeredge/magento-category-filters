@@ -14,6 +14,9 @@ use Magento\CatalogInventory\Model\Stock\StockItemRepository;
 use Magento\Catalog\Model\Product\Attribute\Source\Status;
 use Magento\Catalog\Model\Product\Type;
 use OuterEdge\CategoryFilters\Helper\Data;
+use Magento\Framework\Stdlib\DateTime\DateTime;
+use Magento\Framework\App\ResourceConnection;
+use Magento\Framework\App\State;
 
 class Cron
 {
@@ -41,79 +44,55 @@ class Cron
         protected StockRegistryInterface $stockRegistryInterface,
         protected ProductRepositoryInterface $productRepositoryInterface,
         protected StockItemRepository $stockItemRepository,
-        protected Data $helper
+        protected Data $helper,
+        protected DateTime $dateTime,
+        protected ResourceConnection $resourceConnection,
+        protected State $state
     )
     {
         $this->bestSellingRange = self::BEST_SELLING_RANGE;
+        $this->state->setAreaCode('adminhtml');
     }
 
     private function getBestSellingProductsCollection()
     {
-        $subquery = new \Zend_Db_Expr("(
-            SELECT soi.product_id, COUNT(soi.product_id) AS `times_ordered`, soi.store_id
-            FROM `sales_order_item` as soi
-            WHERE (soi.created_at BETWEEN DATE_SUB(NOW(), INTERVAL {$this->bestSellingRange} DAY) AND NOW())
-            GROUP BY soi.product_id)");
+        $to = $this->dateTime->gmtDate('Y-m-d');
+        $from = $this->dateTime->gmtDate('Y-m-d', strtotime("-{$this->bestSellingRange} days"));
+      
+        $connection = $this->resourceConnection->getConnection();
+        $select = $connection->select()
+            ->from(
+                ['main_table' => $this->resourceConnection->getTableName('sales_bestsellers_aggregated_monthly')],
+                [
+                    'product_id',
+                    'rating_pos',
+                    'qty_ordered' => new \Zend_Db_Expr('SUM(qty_ordered)')            
+                ]
+            )    
+            ->where('period <= ?', $to)
+            ->where('period >= ?', $from)
+            ->group('main_table.product_id');
 
-        $collection = $this->productCollectionFactory->create();
-        $collection->getSelect()->joinInner(
-            ['soi' => $subquery],
-            'e.entity_id = soi.product_id',
-            ['soi.times_ordered', 'soi.store_id']
-        )
-        ->where("`e`.`type_id` IN('simple', 'virtual')")
-        ->order('soi.times_ordered DESC');
-
-        //echo $collection->getSelect(); die();
-        return $collection;
+        return $connection->fetchAll($select);
     }
 
     public function setQtyOrdered()
     {
         try {
             $productIdsToIndex = [];
+
             foreach ($this->getBestSellingProductsCollection() as $product) {
-            
-                $qtyOrdered = $product->getTimesOrdered();
+                
+                $product = $this->productRepositoryInterface->getById($product['product_id']);
+                $ratingScore = intval(round((9 - $product['rating_pos']) * (98 / 8) + 1));
 
-                //var_dump($product->getSku().' : '.$product->getTypeId().' : '.$qtyOrdered);
-
-                $parentsIds = $this->configModel->getParentIdsByChild($product->getId());
-                foreach ($parentsIds as $parentId) {
-                    $productParent = $this->productRepositoryInterface->getById($parentId);
-
-                    if ($productParent->getTimesOrdered() > 0) {
-                        $qtyOrdered = $productParent->getTimesOrdered();
-                    }
-
-                    /*
-                    * Force parent to update qty_ordered
-                    */
+                if ($product->getQtyOrdered() != $ratingScore) {
                     $this->action->updateAttributes(
-                        [$productParent->getId()],
-                        ['qty_ordered' => $qtyOrdered],
-                        $productParent->getStoreId());
-                    $productIdsToIndex[] = $productParent->getId();
-
-                    /*
-                    * Force childs to have the same value of parents
-                    * That way elasticsearch dont mess with value
-                    */
-                    $childrensConfig = $productParent->getTypeInstance()->getUsedProducts($productParent);
-                    foreach ($childrensConfig as $child) {
-                        $this->action->updateAttributes(
-                            [$child->getId()],
-                            ['qty_ordered' => $qtyOrdered],
-                            $child->getStoreId());
-                        $productIdsToIndex[] = $child->getId();
-                    }
+                        [$product->getId()],
+                        ['qty_ordered' => $ratingScore],
+                        $product->getStoreId());
+                    $productIdsToIndex[] = $product->getId();
                 }
-
-                $this->action->updateAttributes(
-                    [$product->getId()],
-                    ['qty_ordered' => $qtyOrdered],
-                    $product->getStoreId());
-                $productIdsToIndex[] = $product->getId();
             }
 
             //Perform bulk re-indexing
