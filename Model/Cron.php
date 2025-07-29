@@ -64,17 +64,16 @@ class Cron
     {
         $to = $this->dateTime->gmtDate('Y-m-d');
         $from = $this->dateTime->gmtDate('Y-m-d', strtotime("-{$this->bestSellingRange} days"));
-      
+
         $connection = $this->resourceConnection->getConnection();
         $select = $connection->select()
             ->from(
                 ['main_table' => $this->resourceConnection->getTableName('sales_bestsellers_aggregated_monthly')],
                 [
                     'product_id',
-                    'rating_pos',
-                    'qty_ordered' => new \Zend_Db_Expr('SUM(qty_ordered)')            
+                    'rating_pos'
                 ]
-            )    
+            )
             ->where('period <= ?', $to)
             ->where('period >= ?', $from)
             ->group('main_table.product_id')
@@ -83,20 +82,19 @@ class Cron
         return $connection->fetchAll($select);
     }
 
-    public function setQtyOrdered()
+    public function setPopularity()
     {
         try {
             $productIdsToIndex = [];
 
             foreach ($this->getBestSellingProductsCollection() as $item) {
-                
                 $product = $this->productRepositoryInterface->getById($item['product_id']);
                 $ratingScore = intval(round((9 - $item['rating_pos']) * (98 / 8) + 1));
 
-                if ($product->getQtyOrdered() != $ratingScore) {
+                if ($product->getPopularity() != $ratingScore) {
                     $this->action->updateAttributes(
                         [$product->getId()],
-                        ['qty_ordered' => $ratingScore],
+                        ['popularity' => $ratingScore],
                         $product->getStoreId());
                     $productIdsToIndex[] = $product->getId();
                 }
@@ -133,8 +131,6 @@ class Cron
                 if (!empty($salable) && isset($salable[0]['qty'])) {
                     $isInStock = ($salable[0]['qty']) >= 1 ? 1 : 0;
                 }
-
-                //var_dump($product->getSku().' : '.$product->getTypeId().' : '.$isInStock);
 
                 $parentsIds = $this->configModel->getParentIdsByChild($product->getId());
                 foreach ($parentsIds as $parentId) {
@@ -198,7 +194,7 @@ class Cron
     {
         $collection = $this->productCollectionFactory->create()
             ->addAttributeToFilter('status', Status::STATUS_ENABLED)
-            ->addAttributeToFilter('type_id', ['in'=> [
+            ->addAttributeToFilter('type_id', ['in' => [
                 Type::TYPE_SIMPLE,
                 Type::TYPE_VIRTUAL
             ]])
@@ -208,7 +204,6 @@ class Cron
                 ]) */
             ->load();
 
-       // echo $collection->getSelect(); die();
         return $collection;
     }
 

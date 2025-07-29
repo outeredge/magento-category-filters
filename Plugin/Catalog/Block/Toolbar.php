@@ -30,13 +30,13 @@ class Toolbar
                 case 'created_at_desc':
                     $subject->getCollection()->setOrder('created_at', 'desc');
                     break;
-                case 'qty_ordered':
-                    $subject->getCollection()->setOrder('qty_ordered', 'desc');
+                case 'popularity':
+                    $subject->getCollection()->setOrder('popularity', 'desc');
                     break;
             }
         }
 
-        if ($this->helper->isInStockFirstEnabled()) {          
+        if ($this->helper->isInStockFirstEnabled()) {
             $collection->setOrder('in_stock_search', 'desc');
         }
 

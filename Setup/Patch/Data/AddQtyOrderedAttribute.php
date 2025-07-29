@@ -11,7 +11,7 @@ use Magento\Framework\Setup\Patch\DataPatchInterface;
 use Magento\Catalog\Model\Product;
 use Magento\Eav\Model\Entity\Attribute\ScopedAttributeInterface;
 
-class AddQtyOrderedAttribute implements DataPatchInterface
+class AddPopularityAttribute implements DataPatchInterface
 {
     public function __construct(
         protected ModuleDataSetupInterface $moduleDataSetup,
@@ -31,9 +31,9 @@ class AddQtyOrderedAttribute implements DataPatchInterface
         try {
             $eavSetup->addAttribute(
                 Product::ENTITY,
-                'qty_ordered',
+                'popularity',
                 [
-                    'label' => 'Qty Ordered (Used for sorting by popularity - based on last x days set in config)',
+                    'label' => 'Popularity',
                     'group' => 'General',
                     'type' => 'int',
                     'input' => 'text',
@@ -48,14 +48,13 @@ class AddQtyOrderedAttribute implements DataPatchInterface
                     'is_html_allowed_on_front' => false,
                     'visible_on_front' => false,
                     'used_in_product_listing' => false,
-                    'user_defined' => true,
+                    'user_defined' => false,
                     'searchable' => false,
                     'filterable' => false,
                     'comparable' => false,
                     'used_for_sort_by' => true
                 ]
             );
-
         } catch (Exception $e) {
             $this->logger->error($e->getMessage());
         }
@@ -79,6 +78,6 @@ class AddQtyOrderedAttribute implements DataPatchInterface
 
     public static function getVersion()
     {
-        return '2.0.0';
+        return '2.0.1';
     }
 }

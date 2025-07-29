@@ -25,4 +25,4 @@ class Data extends AbstractHelper
         );
     }
 }
-?>
+

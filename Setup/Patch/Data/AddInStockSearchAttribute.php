@@ -33,7 +33,7 @@ class AddInStockSearchAttribute implements DataPatchInterface
                 Product::ENTITY,
                 'in_stock_search',
                 [
-                    'label' => 'In Stock Search (Used for sorting in stock products first)',
+                    'label' => 'In Stock Search',
                     'group' => 'General',
                     'type' => 'int',
                     'input' => 'boolean',
@@ -49,14 +49,13 @@ class AddInStockSearchAttribute implements DataPatchInterface
                     'is_html_allowed_on_front' => false,
                     'visible_on_front' => false,
                     'used_in_product_listing' => false,
-                    'user_defined' => true,
+                    'user_defined' => false,
                     'searchable' => false,
                     'filterable' => false,
                     'comparable' => false,
                     'used_for_sort_by' => true
                 ]
             );
-
         } catch (Exception $e) {
             $this->logger->error($e->getMessage());
         }
@@ -80,6 +79,6 @@ class AddInStockSearchAttribute implements DataPatchInterface
 
     public static function getVersion()
     {
-        return '2.0.0';
+        return '2.0.1';
     }
 }

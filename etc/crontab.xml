@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
 	<group id="default">
-		<job instance="OuterEdge\CategoryFilters\Model\Cron" method="setQtyOrdered" name="set_qty_ordered_nightly">
+		<job instance="OuterEdge\CategoryFilters\Model\Cron" method="setPopularity" name="set_popularity_nightly">
 			<schedule>0 3 * * *</schedule>
 		</job>
 		<job instance="OuterEdge\CategoryFilters\Model\Cron" method="setInStockSearch" name="set_in_stock_search_nightly">
