@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Store:etc/config.xsd">
+    <default>
+        <oe_category_filter>
+            <settings>
+                <enable_in_stock_first>0</enable_in_stock_first>
+                <enable_popularity>0</enable_popularity>
+                <best_selling_range>30</best_selling_range>
+            </settings>
+        </oe_category_filter>
+    </default>
+</config>
