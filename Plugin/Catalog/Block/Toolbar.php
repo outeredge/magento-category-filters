@@ -2,9 +2,14 @@
 namespace OuterEdge\CategoryFilters\Plugin\Catalog\Block;
 
 use Magento\Catalog\Block\Product\ProductList\Toolbar as CoreToolbar;
+use OuterEdge\CategoryFilters\Helper\Data;
 
 class Toolbar
 {
+    public function __construct(
+        protected Data $helper
+    ) {
+    }
 
     /**
     * @param CoreToolbar $subject
@@ -25,7 +30,14 @@ class Toolbar
                 case 'created_at_desc':
                     $subject->getCollection()->setOrder('created_at', 'desc');
                     break;
+                case 'popularity':
+                    $subject->getCollection()->setOrder('popularity', 'desc');
+                    break;
             }
+        }
+
+        if ($this->helper->isInStockFirstEnabled()) {
+            $collection->setOrder('in_stock_search', 'desc');
         }
 
         return $result;

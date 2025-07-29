@@ -108,7 +108,6 @@ class AddSortingAttributes implements DataPatchInterface
                     'used_for_sort_by' => true
                 ]
             );
-
         } catch (Exception $e) {
             $this->logger->error($e->getMessage());
         }
