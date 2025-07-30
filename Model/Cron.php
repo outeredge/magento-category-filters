@@ -84,6 +84,10 @@ class Cron
 
     public function setPopularity()
     {
+        if (!$this->helper->isPopularityEnabled()) {
+            return;
+        }
+        
         try {
             $productIdsToIndex = [];
 
