@@ -84,21 +84,21 @@ class Cron
 
     public function setPopularity()
     {
+        $this->logger->info('Running setPopularity cron job');
+
         if (!$this->helper->isPopularityEnabled()) {
             return;
         }
-        
         try {
             $productIdsToIndex = [];
 
             foreach ($this->getBestSellingProductsCollection() as $item) {
                 $product = $this->productRepositoryInterface->getById($item['product_id']);
-                $ratingScore = intval(round((9 - $item['rating_pos']) * (98 / 8) + 1));
 
-                if ($product->getPopularity() != $ratingScore) {
+                if ($product->getPopularity() != $item['rating_pos']) {
                     $this->action->updateAttributes(
                         [$product->getId()],
-                        ['popularity' => $ratingScore],
+                        ['popularity' => $item['rating_pos']],
                         $product->getStoreId());
                     $productIdsToIndex[] = $product->getId();
                 }
@@ -113,15 +113,18 @@ class Cron
                 }
             }
         } catch (\Exception $e) {
-            $this->logger->critical($e->getMessage());
+            $this->logger->critical('Error running setPopularity cron job: ' . $e->getMessage());
         }
+        $this->logger->info('Finished setPopularity cron job');
 
         return;
     }
 
     public function setInStockSearch()
     {
+        $this->logger->info('Running setInStockSearch cron job');
         if (!$this->helper->isInStockFirstEnabled()) {
+            $this->logger->info('setInStockSearch cron job disabled');
             return;
         }
 
@@ -188,8 +191,9 @@ class Cron
                 }
             }
         } catch (\Exception $e) {
-            $this->logger->critical($e->getMessage());
+            $this->logger->critical('Error running setInStockSearch cron job: ' . $e->getMessage());
         }
+        $this->logger->info('Finished setInStockSearch cron job');
 
         return;
     }

@@ -31,7 +31,7 @@ class Toolbar
                     $subject->getCollection()->setOrder('created_at', 'desc');
                     break;
                 case 'popularity':
-                    $subject->getCollection()->setOrder('popularity', 'desc');
+                    $subject->getCollection()->setOrder('popularity', 'asc');
                     break;
             }
         }
