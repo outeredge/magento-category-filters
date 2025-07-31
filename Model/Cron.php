@@ -89,7 +89,6 @@ class Cron
         if (!$this->helper->isPopularityEnabled()) {
             return;
         }
-
         try {
             $productIdsToIndex = [];
 
