@@ -85,6 +85,11 @@ class Cron
     public function setPopularity()
     {
         $this->logger->info('Running setPopularity cron job');
+
+        if (!$this->helper->isPopularityEnabled()) {
+            return;
+        }
+
         try {
             $productIdsToIndex = [];
 
