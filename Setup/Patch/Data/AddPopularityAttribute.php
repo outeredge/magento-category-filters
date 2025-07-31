@@ -40,7 +40,7 @@ class AddPopularityAttribute implements DataPatchInterface
                     'required' => false,
                     'sort_order' => 50,
                     'global' => ScopedAttributeInterface::SCOPE_GLOBAL,
-                    'default' => 'null',
+                    'default' => 1000,
                     'is_used_in_grid' => false,
                     'is_visible_in_grid' => false,
                     'is_filterable_in_grid' => false,

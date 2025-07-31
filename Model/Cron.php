@@ -93,12 +93,11 @@ class Cron
 
             foreach ($this->getBestSellingProductsCollection() as $item) {
                 $product = $this->productRepositoryInterface->getById($item['product_id']);
-                $ratingScore = intval(round((9 - $item['rating_pos']) * (98 / 8) + 1));
 
-                if ($product->getPopularity() != $ratingScore) {
+                if ($product->getPopularity() != $item['rating_pos']) {
                     $this->action->updateAttributes(
                         [$product->getId()],
-                        ['popularity' => $ratingScore],
+                        ['popularity' => $item['rating_pos']],
                         $product->getStoreId());
                     $productIdsToIndex[] = $product->getId();
                 }
