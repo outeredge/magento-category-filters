@@ -57,7 +57,6 @@ class Cron
             'oe_category_filter/settings/best_selling_range',
             ScopeInterface::SCOPE_STORE
         ) ?? self::BEST_SELLING_RANGE;
-        $this->state->setAreaCode('adminhtml');
     }
 
     private function getBestSellingProductsCollection()
