@@ -2,7 +2,7 @@
     "name": "outeredge/magento-category-filters",
     "description": "Magento Category Filters Module by outer/edge",
     "type": "magento2-module",
-    "version": "2.0.6",
+    "version": "2.0.7",
     "license": [
         "MIT"
     ],

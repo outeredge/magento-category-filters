@@ -1,10 +1,10 @@
 <?xml version="1.0" ?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Cron:etc/crontab.xsd">
 	<group id="default">
-		<job instance="OuterEdge\CategoryFilters\Model\Cron" method="setPopularity" name="set_popularity_nightly">
+		<job instance="OuterEdge\CategoryFilters\Cron\SetPopularity" method="execute" name="oe_set_popularity_nightly_cron">
 			<schedule>0 3 * * *</schedule>
 		</job>
-		<job instance="OuterEdge\CategoryFilters\Model\Cron" method="setInStockSearch" name="set_in_stock_search_nightly">
+		<job instance="OuterEdge\CategoryFilters\Cron\SetInStockSearch" method="execute" name="oe_set_in_stock_search_nightly_cron">
 			<schedule>0 3 * * *</schedule>
 		</job>
 	</group>
